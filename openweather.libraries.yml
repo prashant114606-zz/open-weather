@@ -1,0 +1,5 @@
+openweather_theme:
+  version: 8.x
+  css:
+    base:
+      css/openweather.css: {}

@@ -1,0 +1,5 @@
+name: Open Weather
+type: module
+description: Details about the weather forecast
+package: custom
+core: 8.x

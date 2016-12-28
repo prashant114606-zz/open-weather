@@ -1,0 +1,16 @@
+<?php
+/**
+ * @file
+ * Provides a customized openweather report using open weather API.
+ */
+
+/**
+ * Implements hook_theme().
+ */
+function openweather_theme($existing, $type, $theme, $path) {
+  return array(
+    'openweather' => array(
+      'variables' => array('openweather_detail' => NULL),
+    ),
+  );
+}
