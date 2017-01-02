@@ -145,6 +145,7 @@ class WeatherBlock extends BlockBase implements ContainerFactoryPluginInterface 
       $city_name = $this->t('not found');
       return $city_name;
     }
+    $html = [];
     $data = $this->weatherservice->getWeatherInformation($config);
     $k = json_decode($data, TRUE);
     $current_time = REQUEST_TIME;
@@ -152,7 +153,6 @@ class WeatherBlock extends BlockBase implements ContainerFactoryPluginInterface 
     $date_input = explode(",", $date);
     $time_input = explode("-", $date_input[2]);
 
-    $html = [];
     $dependency = NULL;
     foreach ($config['outputitems'] as $key => $value) {
       if (!empty($config['outputitems'][$value])) {
@@ -257,8 +257,9 @@ class WeatherBlock extends BlockBase implements ContainerFactoryPluginInterface 
       $renderer = \Drupal::service('renderer');
       $renderer->addCacheableDependency($build, $dependency);
     }
-
-    return $build;
+    if (!empty($k)) {
+      return $build;
+    }
   }
 
 }
