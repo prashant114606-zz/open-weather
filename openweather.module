@@ -12,5 +12,8 @@ function openweather_theme($existing, $type, $theme, $path) {
     'openweather' => array(
       'variables' => array('openweather_detail' => NULL),
     ),
+    'openweather_hourlyforecast' => array(
+      'variables' => array('hourlyforecast_detail' => NULL),
+    ),
   );
 }
