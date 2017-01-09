@@ -55,6 +55,7 @@ class WeatherBlock extends BlockBase implements ContainerFactoryPluginInterface 
   public function blockForm($form, FormStateInterface $form_state) {
     $form = parent::blockForm($form, $form_state);
     $config = $this->getConfiguration();
+
     $form['input_options'] = array(
       '#type' => 'radios',
       '#title' => t('Select your option'),
@@ -64,11 +65,14 @@ class WeatherBlock extends BlockBase implements ContainerFactoryPluginInterface 
         'zip_code' => 'Zip Code',
         'geo_coord' => 'Geographic Coordinates',
       ),
+      '#default_value' => !empty($config['input_options']) ? $config['input_options'] : 'city_name',
     );
     $form['input_value'] = array(
       '#type' => 'textfield',
-      '#title' => t('Enter the Selected Value'),
+      '#title' => t('Enter the Value for selected option'),
       '#required' => TRUE,
+      '#description' => t('In case of geo coordinates please follow the format lat,lon for example: 130,131'),
+      '#default_value' => $config['input_value'],
     );
 
     if (\Drupal::moduleHandler()->moduleExists("token")) {
@@ -82,8 +86,10 @@ class WeatherBlock extends BlockBase implements ContainerFactoryPluginInterface 
     $form['count'] = array(
       '#type' => 'number',
       '#min' => '1',
-      '#title' => t('Enter the count number'),
+      '#title' => t('Enter the number count'),
+      '#default_value' => !empty($config['count']) ? $config['count'] : '1',
       '#required' => TRUE,
+      '#description' => t('Select the count in case of hourlyforecast maximum value should be 36 and in case of daily forecast maximum value should be 7. in case of current weather forecast value is the default value'),
     );
 
     $form['display_select'] = array(
@@ -94,6 +100,7 @@ class WeatherBlock extends BlockBase implements ContainerFactoryPluginInterface 
         'forecast_hourly' => 'Forecast after 3 hours each',
         'forecast_daily' => 'Daily Forecast',
       ),
+      '#default_value' => !empty($config['display_type']) ? $config['display_type'] : 'current_details',
     );
 
     $weatherdata = array(
@@ -125,8 +132,8 @@ class WeatherBlock extends BlockBase implements ContainerFactoryPluginInterface 
     $form['weatherdata']['items'] = array(
       '#type' => 'checkboxes',
       '#options' => $weatherdata,
-      '#description' => t('Select output data you want to see.'),
-      '#default_value' => array(
+      '#description' => t('Select output data you want to display.'),
+      '#default_value' => !empty($config['outputitems']) ? $config['outputitems'] : array(
         'name',
         'weather',
         'temp',
