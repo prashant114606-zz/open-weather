@@ -188,6 +188,9 @@ class WeatherBlock extends BlockBase implements ContainerFactoryPluginInterface 
         break;
 
       case 'forecast_daily':
+        $build = [
+          '#markup' => $this->t('Working on this functionality'),
+        ];
         break;
     }
 
