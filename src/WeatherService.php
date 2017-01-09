@@ -1,4 +1,5 @@
 <?php
+
 namespace Drupal\openweather;
 
 use Drupal\Component\Utility\Html;

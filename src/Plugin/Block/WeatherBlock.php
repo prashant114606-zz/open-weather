@@ -1,4 +1,5 @@
 <?php
+
 namespace Drupal\openweather\Plugin\Block;
 
 use Drupal\Core\Block\BlockBase;

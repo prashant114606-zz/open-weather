@@ -1,4 +1,5 @@
 <?php
+
 namespace Drupal\openweather\Form;
 
 use Drupal\Core\Form\ConfigFormBase;
