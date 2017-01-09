@@ -55,7 +55,7 @@ class WeatherBlock extends BlockBase implements ContainerFactoryPluginInterface 
   public function blockForm($form, FormStateInterface $form_state) {
     $form = parent::blockForm($form, $form_state);
     $config = $this->getConfiguration();
-    $form['sample_radios'] = array(
+    $form['input_options'] = array(
       '#type' => 'radios',
       '#title' => t('Select your option'),
       '#options' => array(
@@ -68,6 +68,7 @@ class WeatherBlock extends BlockBase implements ContainerFactoryPluginInterface 
     $form['input_value'] = array(
       '#type' => 'textfield',
       '#title' => t('Enter the Selected Value'),
+      '#required' => TRUE,
     );
 
     if (\Drupal::moduleHandler()->moduleExists("token")) {
@@ -77,6 +78,24 @@ class WeatherBlock extends BlockBase implements ContainerFactoryPluginInterface 
         '#theme' => 'token_tree_link',
       );
     }
+
+    $form['count'] = array(
+      '#type' => 'number',
+      '#min' => '1',
+      '#title' => t('Enter the count number'),
+      '#required' => TRUE,
+    );
+
+    $form['display_select'] = array(
+      '#type' => 'select',
+      '#title' => t('Select your option'),
+      '#options' => array(
+        'current_details' => 'Current Details',
+        'forecast_hourly' => 'Forecast after 3 hours each',
+        'forecast_daily' => 'Daily Forecast',
+      ),
+    );
+
     $weatherdata = array(
       'name' => t('City Name'),
       'humidity' => t('Humidity'),
@@ -110,6 +129,7 @@ class WeatherBlock extends BlockBase implements ContainerFactoryPluginInterface 
       '#default_value' => array(
         'name',
         'weather',
+        'temp',
         'country',
         'time',
         'humidity',
@@ -133,7 +153,9 @@ class WeatherBlock extends BlockBase implements ContainerFactoryPluginInterface 
     else {
       $this->setConfigurationValue('input_value', $form_state->getValue('input_value'));
     }
-    $this->setConfigurationValue('radio_value', $form_state->getValue('sample_radios'));
+    $this->setConfigurationValue('count', $form_state->getValue('count'));
+    $this->setConfigurationValue('input_options', $form_state->getValue('input_options'));
+    $this->setConfigurationValue('display_type', $form_state->getValue('display_select'));
   }
 
   /**
@@ -141,125 +163,29 @@ class WeatherBlock extends BlockBase implements ContainerFactoryPluginInterface 
    */
   public function build() {
     $config = $this->getConfiguration();
-    if (empty($config['input_value'])) {
-      $city_name = $this->t('not found');
-      return $city_name;
-    }
     $html = [];
-    $data = $this->weatherservice->getWeatherInformation($config);
-    $k = json_decode($data, TRUE);
-    $current_time = REQUEST_TIME;
-    $date = format_date($current_time, $type = 'long', $format = '', $timezone = NULL, $langcode = NULL);
-    $date_input = explode(",", $date);
-    $time_input = explode("-", $date_input[2]);
-
-    $dependency = NULL;
-    foreach ($config['outputitems'] as $key => $value) {
-      if (!empty($config['outputitems'][$value])) {
-        switch ($config['outputitems'][$value]) {
-          case 'humidity':
-            $html[$value] = $k['main']['humidity'] . '%';
-            break;
-
-          case 'temp_max':
-            $html[$value] = round($k['main']['temp_max'] - 273.15, 2) . '°C';
-            break;
-
-          case 'temp_min':
-            $html[$value] = round($k['main']['temp_min'] - 273.15, 2) . '°C';
-            break;
-
-          case 'name':
-            $html[$value] = $k['name'];
-            break;
-
-          case 'date':
-            $html[$value] = $date_input[1] . $time_input[0];
-            break;
-
-          case 'coord':
-            $html[$value]['lon'] = $k['coord']['lon'];
-            $html[$value]['lat'] = $k['coord']['lat'];
-            break;
-
-          case 'weather':
-            $html[$value]['desc'] = $k['weather'][0]['main'];
-            $html[$value]['image'] = $k['weather'][0]['icon'];
-            break;
-
-          case 'temp':
-            $html[$value] = round($k['main']['temp'] - 273.15) . '°C';
-            break;
-
-          case 'pressure':
-            $html[$value] = $k['main']['pressure'];
-            break;
-
-          case 'sea_level':
-            $html[$value] = $k['main']['sea_level'];
-            break;
-
-          case 'grnd_level':
-            $html[$value] = $k['main']['grnd_level'];
-            break;
-
-          case 'wind_speed':
-            $html[$value] = round($k['wind']['speed'] * (60 * 60 / 1000), 1) . 'km/h';
-            break;
-
-          case 'wind_deg':
-            $html[$value] = $k['wind']['deg'];
-            break;
-
-          case 'time':
-            $dependency = $current_time;
-            $html[$value] = $time_input[1];
-            break;
-
-          case 'day':
-            $html[$value] = $date_input[0];
-            break;
-
-          case 'country':
-            $html[$value] = $k['sys']['country'];
-            break;
-
-          case 'sunrise':
-            $sunrise = format_date($k['sys']['sunrise'], $type = 'long', $format = '', $timezone = NULL, $langcode = NULL);
-            $dependency = $sunrise;
-            $sunrise_time = explode("-", $sunrise);
-            $html[$value] = $sunrise_time[1];
-            break;
-
-          case 'sunset':
-            $sunset = format_date($k['sys']['sunset'], $type = 'long', $format = '', $timezone = NULL, $langcode = NULL);
-            $dependency = $sunset;
-            $sunset_time = explode("-", $sunset);
-            $html[$value] = $sunset_time[1];
-            break;
-
-        }
-      }
+    $output = json_decode($this->weatherservice->getWeatherInformation($config), TRUE);
+    if (empty($output)) {
+      return array(
+        '#markup' => $this->t('The @input not found!', array('@input' => $config['input_options'])),
+        '#cache' => array('max-age' => 0),
+      );
     }
 
-    $build[] = [
-      '#theme' => 'openweather',
-      '#openweather_detail' => $html,
-      '#attached' => array(
-        'library' => array(
-          'openweather/openweather_theme',
-        ),
-      ),
-      '#cache' => array('max-age' => 0),
-    ];
+    switch ($config['display_type']) {
+      case 'current_details':
+        $build = $this->weatherservice->getCurrentWeatherInformation($output, $config);
+        break;
 
-    if ($dependency) {
-      $renderer = \Drupal::service('renderer');
-      $renderer->addCacheableDependency($build, $dependency);
+      case 'forecast_hourly':
+        $build = $this->weatherservice->getHourlyForecastWeatherInformation($output, $config);
+        break;
+
+      case 'forecast_daily':
+        break;
     }
-    if (!empty($k)) {
-      return $build;
-    }
+
+    return $build;
   }
 
 }
