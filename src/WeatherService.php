@@ -86,8 +86,7 @@ class WeatherService {
    * Return an array containing the current weather information.
    */
   public function getCurrentWeatherInformation($output, $config) {
-    $dependency = NULL;
-    foreach ($config['outputitems'] as $key => $value) {
+    foreach ($config['outputitems'] as $value) {
       if (!empty($config['outputitems'][$value])) {
         switch ($config['outputitems'][$value]) {
           case 'humidity':
@@ -145,7 +144,6 @@ class WeatherService {
             break;
 
           case 'time':
-            $dependency = $current_time;
             $html[$value] = date("g:i a", REQUEST_TIME);
             break;
 
@@ -187,7 +185,7 @@ class WeatherService {
     foreach ($output['list'] as $key => $data) {
       $html[$key]['forecast_time'] = date("g:i a", strtotime($output['list'][$key]['dt_txt']));
       $html[$key]['forecast_date'] = gmstrftime("%B %d", $output['list'][$key]['dt']);
-      foreach ($config['outputitems'] as $optionkey => $value) {
+      foreach ($config['outputitems'] as $value) {
         if (!empty($config['outputitems'][$value])) {
           switch ($config['outputitems'][$value]) {
             case 'humidity':
@@ -245,7 +243,6 @@ class WeatherService {
               break;
 
             case 'time':
-              $dependency = $current_time;
               $html[$key][$value] = date("g:i a", REQUEST_TIME);
               break;
 

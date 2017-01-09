@@ -29,10 +29,9 @@ class PassConfigForm extends ConfigFormBase {
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
     $form = parent::buildForm($form, $form_state);
-    $config = $this->config('openweather.settings');
     $form['appid'] = array(
       '#type' => 'textfield',
-      '#title' => t('App Id'),
+      '#title' => $this->t('App Id'),
       '#required' => TRUE,
     );
 
@@ -43,8 +42,6 @@ class PassConfigForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    $name = $form_state->getValues();
-    $my_config = \Drupal::config('mymodule.settings')->get('name_of_form_field');
     $this->config('openweather.settings')
       ->set('appid', $form_state->getValue('appid'))
       ->save();

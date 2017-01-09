@@ -59,20 +59,20 @@ class WeatherBlock extends BlockBase implements ContainerFactoryPluginInterface 
 
     $form['input_options'] = array(
       '#type' => 'radios',
-      '#title' => t('Select your option'),
+      '#title' => $this->t('Select your option'),
       '#options' => array(
-        'city_name' => 'City Name',
-        'city_id' => 'City Id',
-        'zip_code' => 'Zip Code',
-        'geo_coord' => 'Geographic Coordinates',
+        'city_name' => $this->t('City Name'),
+        'city_id' => $this->t('City Id'),
+        'zip_code' => $this->t('Zip Code'),
+        'geo_coord' => $this->t('Geographic Coordinates'),
       ),
       '#default_value' => !empty($config['input_options']) ? $config['input_options'] : 'city_name',
     );
     $form['input_value'] = array(
       '#type' => 'textfield',
-      '#title' => t('Enter the Value for selected option'),
+      '#title' => $this->t('Enter the Value for selected option'),
       '#required' => TRUE,
-      '#description' => t('In case of geo coordinates please follow the format lat,lon for example: 130,131'),
+      '#description' => $this->t('In case of geo coordinates please follow the format lat,lon for example: 130,131'),
       '#default_value' => $config['input_value'],
     );
 
@@ -87,53 +87,53 @@ class WeatherBlock extends BlockBase implements ContainerFactoryPluginInterface 
     $form['count'] = array(
       '#type' => 'number',
       '#min' => '1',
-      '#title' => t('Enter the number count'),
+      '#title' => $this->t('Enter the number count'),
       '#default_value' => !empty($config['count']) ? $config['count'] : '1',
       '#required' => TRUE,
-      '#description' => t('Select the count in case of hourlyforecast maximum value should be 36 and in case of daily forecast maximum value should be 7. in case of current weather forecast value is the default value'),
+      '#description' => $this->t('Select the count in case of hourlyforecast maximum value should be 36 and in case of daily forecast maximum value should be 7. in case of current weather forecast value is the default value'),
     );
 
     $form['display_select'] = array(
       '#type' => 'select',
-      '#title' => t('Select your option'),
+      '#title' => $this->t('Select your option'),
       '#options' => array(
-        'current_details' => 'Current Details',
-        'forecast_hourly' => 'Forecast after 3 hours each',
-        'forecast_daily' => 'Daily Forecast',
+        'current_details' => $this->t('Current Details'),
+        'forecast_hourly' => $this->t('Forecast after 3 hours each'),
+        'forecast_daily' => $this->t('Daily Forecast'),
       ),
       '#default_value' => !empty($config['display_type']) ? $config['display_type'] : 'current_details',
     );
 
     $weatherdata = array(
-      'name' => t('City Name'),
-      'humidity' => t('Humidity'),
-      'temp_min' => t('Temp Min'),
-      'temp_max' => t('Temp Max'),
-      'coord' => t('Coordinates'),
-      'weather' => t('Weather details include icon and description'),
-      'temp' => t('current Temperature'),
-      'pressure' => t('pressure'),
-      'sea_level' => t('Sea Level'),
-      'grnd_level' => t('Ground level'),
-      'wind_speed' => t('Wind Speed'),
-      'wind_deg' => t('Wind flow in degree'),
-      'date' => t('Date'),
-      'time' => t('Time'),
-      'day' => t('Day'),
-      'country' => t('Country'),
-      'sunrise' => t('Sunrise time'),
-      'sunset' => t('sunset time'),
+      'name' => $this->t('City Name'),
+      'humidity' => $this->t('Humidity'),
+      'temp_min' => $this->t('Temp Min'),
+      'temp_max' => $this->t('Temp Max'),
+      'coord' => $this->t('Coordinates'),
+      'weather' => $this->t('Weather details include icon and description'),
+      'temp' => $this->t('current Temperature'),
+      'pressure' => $this->t('pressure'),
+      'sea_level' => $this->t('Sea Level'),
+      'grnd_level' => $this->t('Ground level'),
+      'wind_speed' => $this->t('Wind Speed'),
+      'wind_deg' => $this->t('Wind flow in degree'),
+      'date' => $this->t('Date'),
+      'time' => $this->t('Time'),
+      'day' => $this->t('Day'),
+      'country' => $this->t('Country'),
+      'sunrise' => $this->t('Sunrise time'),
+      'sunset' => $this->t('sunset time'),
     );
     $form['weatherdata'] = array(
       '#type' => 'details',
-      '#title' => t('Output Option available for current weather'),
+      '#title' => $this->t('Output Option available for current weather'),
       '#collapsible' => FALSE,
       '#collapsed' => FALSE,
     );
     $form['weatherdata']['items'] = array(
       '#type' => 'checkboxes',
       '#options' => $weatherdata,
-      '#description' => t('Select output data you want to display.'),
+      '#description' => $this->t('Select output data you want to display.'),
       '#default_value' => !empty($config['outputitems']) ? $config['outputitems'] : array(
         'name',
         'weather',
@@ -153,7 +153,6 @@ class WeatherBlock extends BlockBase implements ContainerFactoryPluginInterface 
   public function blockSubmit($form, FormStateInterface $form_state) {
     $token_service = \Drupal::token();
     $message = $token_service->replace($form_state->getValue('input_value'), array('user' => $user));
-    $result = $form_state->getValue('weatherdata')['items'];
     $this->setConfigurationValue('outputitems', $form_state->getValue('weatherdata')['items']);
     if (!empty($message)) {
       $this->setConfigurationValue('input_value', $message);
@@ -171,7 +170,6 @@ class WeatherBlock extends BlockBase implements ContainerFactoryPluginInterface 
    */
   public function build() {
     $config = $this->getConfiguration();
-    $html = [];
     $output = json_decode($this->weatherservice->getWeatherInformation($config), TRUE);
     if (empty($output)) {
       return array(
