@@ -16,8 +16,8 @@ class WeatherService {
    */
   public function createRequest($options) {
     $query = [];
-    $my_config = \Drupal::config('openweather.settings')->get('appid');
-    $query['appid'] = $my_config;
+    $appid_config = \Drupal::config('openweather.settings')->get('appid');
+    $query['appid'] = Html::escape($appid_config);
     $query['cnt'] = $options['count'];
     $input_data = Html::escape($options['input_value']);
     switch ($options['input_options']) {
