@@ -39,7 +39,6 @@ class WeatherService {
         $query['zip'] = $input_data;
         break;
     }
-    // kint($query);
     return $query;
 
   }

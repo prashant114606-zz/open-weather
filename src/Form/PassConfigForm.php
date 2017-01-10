@@ -33,6 +33,7 @@ class PassConfigForm extends ConfigFormBase {
       '#type' => 'textfield',
       '#title' => $this->t('App Id'),
       '#required' => TRUE,
+      '#default_value' => $this->config('openweather.settings')->get('appid'),
     );
 
     return $form;
