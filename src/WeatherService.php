@@ -114,7 +114,7 @@ class WeatherService {
             break;
 
           case 'weather':
-            $html[$value]['desc'] = $output['weather'][0]['main'];
+            $html[$value]['desc'] = $output['weather'][0]['description'];
             $html[$value]['image'] = $output['weather'][0]['icon'];
             break;
 
@@ -178,7 +178,7 @@ class WeatherService {
   }
 
   /**
-   * Return an array containing the forecast weather info with 3 hoursinterval.
+   * Return an array containing the forecast weather info with 3 hours interval.
    */
   public function getHourlyForecastWeatherInformation($output, $config) {
     foreach ($output['list'] as $key => $data) {
@@ -213,7 +213,7 @@ class WeatherService {
               break;
 
             case 'weather':
-              $html[$key][$value]['desc'] = $output['list'][$key]['weather'][0]['main'];
+              $html[$key][$value]['desc'] = $output['list'][$key]['weather'][0]['description'];
               $html[$key][$value]['image'] = $output['list'][$key]['weather'][0]['icon'];
               break;
 
@@ -256,6 +256,7 @@ class WeatherService {
         }
       }
     }
+    // kint($html);
     $build[] = [
       '#theme' => 'openweather_hourlyforecast',
       '#hourlyforecast_detail' => $html,
@@ -267,6 +268,96 @@ class WeatherService {
       '#cache' => array('max-age' => 0),
     ];
     return $build;
+  }
+
+  public function getDailyForecastWeatherInformation($output, $config) {
+    kint($output['list']);
+    foreach ($output['list'] as $key => $data) {
+      $html[$key]['forecast_date'] = gmstrftime("%B %d", $output['list'][$key]['dt']);
+      foreach ($config['outputitems'] as $value) {
+        if (!empty($config['outputitems'][$value])) {
+          switch ($config['outputitems'][$value]) {
+            case 'humidity':
+              $html[$key][$value] = $output['list'][$key]['humidity'] . '%';
+              break;
+
+            case 'temp_max':
+              $html[$key][$value] = round($output['list'][$key]['temp']['max'] - 273.15, 2) . '°C';
+              break;
+
+            case 'temp_min':
+              $html[$key][$value] = round($output['list'][$key]['temp']['max'] - 273.15, 2) . '°C';
+              break;
+
+            case 'name':
+              $html[$key][$value] = $output['city']['name'];
+              break;
+
+            case 'date':
+              $html[$key][$value] = gmstrftime("%B %d %Y", REQUEST_TIME);
+              break;
+
+            case 'coord':
+              $html[$key][$value]['lon'] = $output['city']['coord']['lon'];
+              $html[$key][$value]['lat'] = $output['city']['coord']['lat'];
+              break;
+
+            case 'weather':
+              $html[$key][$value]['desc'] = $output['list'][$key]['weather'][0]['description'];
+              $html[$key][$value]['image'] = $output['list'][$key]['weather'][0]['icon'];
+              break;
+
+            case 'temp':
+              $html[$key][$value] = round($output['list'][$key]['temp']['day'] - 273.15) . '°C';
+              break;
+
+            case 'pressure':
+              $html[$key][$value] = $output['list'][$key]['pressure'];
+              break;
+
+            case 'sea_level':
+              $html[$key][$value] = $output['list'][$key]['main']['sea_level'];
+              break;
+
+            case 'grnd_level':
+              $html[$key][$value] = $output['list'][$key]['main']['grnd_level'];
+              break;
+
+            case 'wind_speed':
+              $html[$key][$value] = round($output['list'][$key]['speed'] * (60 * 60 / 1000), 1) . 'km/h';
+              break;
+
+            case 'wind_deg':
+              $html[$key][$value] = $output['list'][$key]['deg'];
+              break;
+
+            case 'time':
+              $html[$key][$value] = date("g:i a", REQUEST_TIME);
+              break;
+
+            case 'day':
+              $html[$key][$value] = gmstrftime("%A", $output['list'][$key]['dt']);;
+              break;
+
+            case 'country':
+              $html[$key][$value] = $output['city']['country'];
+              break;
+          }
+        }
+      }
+    }
+    // $build[] = [
+    //   // '#theme' => 'openweather_hourlyforecast',
+    //   '#hourlyforecast_detail' => $html,
+    //   // '#attached' => array(
+    //   //   'library' => array(
+    //   //     'openweather/openweatherhourlyforecast_theme',
+    //   //   ),
+    //   // ),
+    //   '#cache' => array('max-age' => 0),
+    // ];
+    kint($html);
+    return $html;
   }
 
 }
