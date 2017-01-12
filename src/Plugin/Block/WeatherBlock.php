@@ -10,15 +10,20 @@ use Drupal\openweather\WeatherService;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 
 /**
- * Provides a 'WeatherBlock' Block.
+ * Provides a 'openWeatherBlock' Block.
  *
  * @Block(
- *   id = "current_weather_block",
- *   admin_label = @Translation("Current Weather Block"),
+ *   id = "open_weather_block",
+ *   admin_label = @Translation("open Weather Block"),
  * )
  */
 class WeatherBlock extends BlockBase implements ContainerFactoryPluginInterface {
 
+  /**
+   * The module handler.
+   *
+   * @var \Drupal\openweather\WeatherService
+   */
   protected $weatherservice;
   /**
    * The module handler.
@@ -120,8 +125,8 @@ class WeatherBlock extends BlockBase implements ContainerFactoryPluginInterface 
       'temp_max' => $this->t('Temp Max'),
       'coord' => $this->t('Coordinates'),
       'weather' => $this->t('Weather details include icon and description'),
-      'temp' => $this->t('current Temperature'),
-      'pressure' => $this->t('pressure'),
+      'temp' => $this->t('Current Temperature'),
+      'pressure' => $this->t('Pressure'),
       'sea_level' => $this->t('Sea Level'),
       'grnd_level' => $this->t('Ground level'),
       'wind_speed' => $this->t('Wind Speed'),
@@ -131,7 +136,7 @@ class WeatherBlock extends BlockBase implements ContainerFactoryPluginInterface 
       'day' => $this->t('Day'),
       'country' => $this->t('Country'),
       'sunrise' => $this->t('Sunrise time'),
-      'sunset' => $this->t('sunset time'),
+      'sunset' => $this->t('Sunset time'),
     );
     $form['weatherdata'] = array(
       '#type' => 'details',
@@ -183,28 +188,23 @@ class WeatherBlock extends BlockBase implements ContainerFactoryPluginInterface 
   public function build() {
     $config = $this->getConfiguration();
     $output = json_decode($this->weatherservice->getWeatherInformation($config), TRUE);
-    if (empty($output)) {
-      return array(
-        '#markup' => $this->t('The @input not found!', array('@input' => $config['input_options'])),
-        '#cache' => array('max-age' => 0),
-      );
+    if (!empty($output)) {
+      switch ($config['display_type']) {
+        case 'current_details':
+          $build = $this->weatherservice->getCurrentWeatherInformation($output, $config);
+          break;
+
+        case 'forecast_hourly':
+          $build = $this->weatherservice->getHourlyForecastWeatherInformation($output, $config);
+          break;
+
+        case 'forecast_daily':
+          $build = $this->weatherservice->getDailyForecastWeatherInformation($output, $config);
+          break;
+      }
+      return $build;
     }
 
-    switch ($config['display_type']) {
-      case 'current_details':
-        $build = $this->weatherservice->getCurrentWeatherInformation($output, $config);
-        break;
-
-      case 'forecast_hourly':
-        $build = $this->weatherservice->getHourlyForecastWeatherInformation($output, $config);
-        break;
-
-      case 'forecast_daily':
-        $build = $this->weatherservice->getDailyForecastWeatherInformation($output, $config);
-        break;
-    }
-
-    return $build;
   }
 
 }

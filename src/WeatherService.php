@@ -246,7 +246,7 @@ class WeatherService {
               break;
 
             case 'day':
-              $html[$key][$value] = gmstrftime("%A", $output['list'][$key]['dt']);;
+              $html[$key][$value] = gmstrftime("%A", $output['list'][$key]['dt']);
               break;
 
             case 'country':
@@ -273,7 +273,6 @@ class WeatherService {
    * Return an array containing the forecast weather on daily basis.
    */
   public function getDailyForecastWeatherInformation($output, $config) {
-    // kint($output['list']);
     foreach ($output['list'] as $key => $data) {
       $html[$key]['forecast_date'] = gmstrftime("%B %d", $output['list'][$key]['dt']);
       foreach ($config['outputitems'] as $value) {
@@ -348,18 +347,17 @@ class WeatherService {
         }
       }
     }
-    // $build[] = [
-    //   // '#theme' => 'openweather_hourlyforecast',
-    //   '#hourlyforecast_detail' => $html,
-    //   // '#attached' => array(
-    //   //   'library' => array(
-    //   //     'openweather/openweatherhourlyforecast_theme',
-    //   //   ),
-    //   // ),
-    //   '#cache' => array('max-age' => 0),
-    // ];
-    kint($html);
-    return $html;
+    $build[] = [
+      '#theme' => 'openweather_dailyforecast',
+      '#dailyforecast_detail' => $html,
+      '#attached' => array(
+        'library' => array(
+          'openweather/openweatherdailyforecast_theme',
+        ),
+      ),
+      '#cache' => array('max-age' => 0),
+    ];
+    return $build;
   }
 
 }
