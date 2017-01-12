@@ -1,6 +1,5 @@
 .open-weather-container {
   background-color: red;
-  /* background-image: ../images/dark_earth; */
   background-image: url("../images/dark_earth.jpg");
   color: #eeeeee;
   width: 100%;

@@ -4,4 +4,4 @@
 
 'administer openweather settings':
   title: Administer openweather settings
-  description: requires permission to make use of the current openweather block for other users.
+  description: Requires permission to make use of the current openweather block for other users.
