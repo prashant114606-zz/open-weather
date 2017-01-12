@@ -2,6 +2,6 @@ openweather.settings:
   path: '/admin/config/user-interface/openweather'
   defaults:
     _form: '\Drupal\openweather\Form\PassConfigForm'
-    _title: 'openweather appid settings'
+    _title: 'openweather settings'
   requirements:
-    _permission: 'administer module openweather'
+    _permission: 'administer openweather settings'
