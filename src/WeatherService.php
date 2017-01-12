@@ -256,7 +256,6 @@ class WeatherService {
         }
       }
     }
-    // kint($html);
     $build[] = [
       '#theme' => 'openweather_hourlyforecast',
       '#hourlyforecast_detail' => $html,
@@ -270,8 +269,11 @@ class WeatherService {
     return $build;
   }
 
+  /**
+   * Return an array containing the forecast weather on daily basis.
+   */
   public function getDailyForecastWeatherInformation($output, $config) {
-    kint($output['list']);
+    // kint($output['list']);
     foreach ($output['list'] as $key => $data) {
       $html[$key]['forecast_date'] = gmstrftime("%B %d", $output['list'][$key]['dt']);
       foreach ($config['outputitems'] as $value) {

@@ -196,15 +196,11 @@ class WeatherBlock extends BlockBase implements ContainerFactoryPluginInterface 
         break;
 
       case 'forecast_hourly':
-        // kint($output);
         $build = $this->weatherservice->getHourlyForecastWeatherInformation($output, $config);
         break;
 
       case 'forecast_daily':
         $build = $this->weatherservice->getDailyForecastWeatherInformation($output, $config);
-        // $build = [
-        //   '#markup' => $this->t('Working on this functionality'),
-        // ];
         break;
     }
 
