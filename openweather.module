@@ -5,6 +5,19 @@
  * Provides a customized openweather report using open weather API.
  */
 
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function openweather_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    case 'help.page.openweather':
+      $output = file_get_contents(drupal_get_path('module', 'openweather') . '/README.txt');
+      return $output;
+  }
+}
+
 /**
  * Implements hook_theme().
  */
@@ -15,6 +28,9 @@ function openweather_theme($existing, $type, $theme, $path) {
     ),
     'openweather_hourlyforecast' => array(
       'variables' => array('hourlyforecast_detail' => NULL),
+    ),
+    'openweather_dailyforecast' => array(
+      'variables' => array('dailyforecast_detail' => NULL),
     ),
   );
 }
