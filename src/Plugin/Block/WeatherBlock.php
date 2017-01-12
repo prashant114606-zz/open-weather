@@ -7,6 +7,7 @@ use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\openweather\WeatherService;
+use Drupal\Core\Extension\ModuleHandlerInterface;
 
 /**
  * Provides a 'WeatherBlock' Block.
@@ -19,6 +20,12 @@ use Drupal\openweather\WeatherService;
 class WeatherBlock extends BlockBase implements ContainerFactoryPluginInterface {
 
   protected $weatherservice;
+  /**
+   * The module handler.
+   *
+   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   */
+  protected $moduleHandler;
 
   /**
    * Constructs a Drupal\Component\Plugin\PluginBase object.
@@ -33,9 +40,10 @@ class WeatherBlock extends BlockBase implements ContainerFactoryPluginInterface 
    * @var string $weatherservice
    *   The information from the Weather service for this block.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, WeatherService $weatherservice) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, WeatherService $weatherservice, ModuleHandlerInterface $module_handler) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->weatherservice = $weatherservice;
+    $this->moduleHandler = $module_handler;
   }
 
   /**
@@ -73,10 +81,10 @@ class WeatherBlock extends BlockBase implements ContainerFactoryPluginInterface 
       '#title' => $this->t('Enter the Value for selected option'),
       '#required' => TRUE,
       '#description' => $this->t('In case of geo coordinates please follow the format lat,lon for example: 130,131'),
-      '#default_value' => $config['input_value'],
+      '#default_value' => !empty($config['input_value']) ? $config['input_value'] : '',
     );
 
-    if (\Drupal::moduleHandler()->moduleExists("token")) {
+    if ($this->moduleHandler->moduleExists("token")) {
       $form['token_help'] = array(
         '#type' => 'markup',
         '#token_types' => array('user'),
@@ -127,7 +135,7 @@ class WeatherBlock extends BlockBase implements ContainerFactoryPluginInterface 
     $form['weatherdata'] = array(
       '#type' => 'details',
       '#title' => $this->t('Output Option available for current weather'),
-      '#collapsible' => FALSE,
+      '#collapsible' => TRUE,
       '#collapsed' => FALSE,
     );
     $form['weatherdata']['items'] = array(
@@ -151,8 +159,11 @@ class WeatherBlock extends BlockBase implements ContainerFactoryPluginInterface 
    * {@inheritdoc}
    */
   public function blockSubmit($form, FormStateInterface $form_state) {
-    $token_service = \Drupal::token();
-    $message = $token_service->replace($form_state->getValue('input_value'), array('user' => $user));
+    if ($this->moduleHandler->moduleExists("token")) {
+      $user = $form_state->getValue('account');
+      $token_service = \Drupal::token();
+      $message = $token_service->replace($form_state->getValue('input_value'), array('user' => $user));
+    }
     $this->setConfigurationValue('outputitems', $form_state->getValue('weatherdata')['items']);
     if (!empty($message)) {
       $this->setConfigurationValue('input_value', $message);

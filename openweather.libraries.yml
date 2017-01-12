@@ -3,6 +3,7 @@ openweather_theme:
   css:
     base:
       css/openweather.css: {}
+
 openweatherhourlyforecast_theme:
   version: 8.x
   css:
