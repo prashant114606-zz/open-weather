@@ -3,13 +3,37 @@
 namespace Drupal\openweather;
 
 use Drupal\Component\Utility\Html;
-use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\ClientInterface;
 
 /**
  * WeatherService.
  */
 class WeatherService {
+
+  /**
+   * Base uri of openweather api.
+   *
+   * @var Drupal\openweather
+   */
+  public static $baseUri = 'http://api.openweathermap.org/';
+
+  /**
+   * The HTTP client to fetch the feed data with.
+   *
+   * @var \GuzzleHttp\ClientInterface
+   */
+  protected $httpClient;
+
+  /**
+   * Constructs a database object.
+   *
+   * @param \GuzzleHttp\ClientInterface $http_client
+   *   The Guzzle HTTP client.
+   */
+  public function __construct(ClientInterface $http_client) {
+    $this->httpClient = $http_client;
+  }
 
   /**
    * Get a complete query for the API.
@@ -48,24 +72,23 @@ class WeatherService {
    */
   public function getWeatherInformation($options) {
     try {
-      $client = new Client(['base_uri' => 'http://api.openweathermap.org/']);
       switch ($options['display_type']) {
         case 'current_details':
-          $response = $client->request('GET', '/data/2.5/weather',
+          $response = $this->httpClient->request('GET', self::$baseUri . '/data/2.5/weather',
           [
             'query' => $this->createRequest($options),
           ]);
           break;
 
         case 'forecast_hourly':
-          $response = $client->request('GET', '/data/2.5/forecast',
+          $response = $this->httpClient->request('GET', self::$baseUri . '/data/2.5/forecast',
           [
             'query' => $this->createRequest($options),
           ]);
           break;
 
         case 'forecast_daily':
-          $response = $client->request('GET', '/data/2.5/forecast/daily',
+          $response = $this->httpClient->request('GET', self::$baseUri . '/data/2.5/forecast/daily',
           [
             'query' => $this->createRequest($options),
           ]);
