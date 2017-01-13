@@ -10,11 +10,11 @@ use Drupal\openweather\WeatherService;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 
 /**
- * Provides a 'openWeatherBlock' Block.
+ * Provides a 'OpenWeatherBlock' Block.
  *
  * @Block(
  *   id = "open_weather_block",
- *   admin_label = @Translation("open Weather Block"),
+ *   admin_label = @Translation("Open Weather Block"),
  * )
  */
 class WeatherBlock extends BlockBase implements ContainerFactoryPluginInterface {
