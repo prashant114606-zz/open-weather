@@ -9,8 +9,12 @@
 
 <div class="open-weather-container">
   <div class="open-weather-list">
-    {% if(openweather_detail.name) %}
-    <div class="city"><h3>{{ openweather_detail.name }},{{ openweather_detail.country }}</h3></div>
+    {% if (openweather_detail.name) and (openweather_detail.country) %}
+    <div class="city"><h3>{{ openweather_detail.name }}, {{ openweather_detail.country }}</h3></div>
+    {% elseif (openweather_detail.name) %}
+    <div class="city"><h3>{{ openweather_detail.name }}</h3></div>
+    {% elseif (openweather_detail.country) %}
+    <div class="city"><h3>{{ openweather_detail.country }}</h3></div>
     {% endif %}
     {% if(openweather_detail.date) %}
     <div class="date">

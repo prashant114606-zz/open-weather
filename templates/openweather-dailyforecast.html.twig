@@ -10,8 +10,12 @@
 <div class = "open-weather-dailyforecast-container">
   <div class= "open-weather-dailyforecast-list">
     <div class = "dailyforecast-common">
-      {% if(dailyforecast_detail[0].name) %}
-      <div class="city"><h3>{{ dailyforecast_detail[0].name }},{{ dailyforecast_detail[0].country }}</h3></div>
+      {% if (dailyforecast_detail[0].name) and (dailyforecast_detail[0].country) %}
+      <div class="city"><h3>{{ dailyforecast_detail[0].name }}, {{ dailyforecast_detail[0].country }}</h3></div>
+      {% elseif (dailyforecast_detail[0].name) %}
+      <div class="city"><h3>{{ dailyforecast_detail[0].name }}</h3></div>
+      {% elseif (dailyforecast_detail[0].country) %}
+      <div class="city"><h3>{{ dailyforecast_detail[0].country }}</h3></div>
       {% endif %}
       {% if(dailyforecast_detail[0].date) %}
       <div class="date">
