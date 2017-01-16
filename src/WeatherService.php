@@ -100,14 +100,27 @@ class WeatherService {
       watchdog_exception('openweather', $e);
       return FALSE;
     }
-    $data = $response->getBody()->getContents();
-    return $data;
+    return $response->getBody()->getContents();
+  }
+
+  /**
+   * Get timezone content by coordinates from GeoNames JSON webservice.
+   *
+   * @param int $latitude
+   *   The latitude decimal degrees.
+   * @param int $longitude
+   *   The longitude decimal degrees.
+   */
+  public function getTimezoneGeo($latitude, $longitude) {
+    $timezone = $this->httpClient->request('GET', "http://ws.geonames.org/timezone?lat=" . $latitude . "&lng=" . $longitude . "&style=full&username=demo");
+    return simplexml_load_string($timezone->getBody()->getContents());
   }
 
   /**
    * Return an array containing the current weather information.
    */
   public function getCurrentWeatherInformation($output, $config) {
+    $timezonedata = $this->getTimezoneGeo($output['coord']['lat'], $output['coord']['lon']);
     foreach ($config['outputitems'] as $value) {
       if (!empty($config['outputitems'][$value])) {
         switch ($config['outputitems'][$value]) {
@@ -128,7 +141,7 @@ class WeatherService {
             break;
 
           case 'date':
-            $html[$value] = gmstrftime("%B %d %Y", REQUEST_TIME);
+            $html[$value] = date("F j, Y", strtotime((string) $timezonedata->timezone->time));
             break;
 
           case 'coord':
@@ -166,11 +179,11 @@ class WeatherService {
             break;
 
           case 'time':
-            $html[$value] = date("g:i a", REQUEST_TIME);
+            $html[$value] = date("g:i a", strtotime((string) $timezonedata->timezone->time));
             break;
 
           case 'day':
-            $html[$value] = gmstrftime("%A", REQUEST_TIME);
+            $html[$value] = date("l", strtotime((string) $timezonedata->timezone->time));
             break;
 
           case 'country':
@@ -178,11 +191,11 @@ class WeatherService {
             break;
 
           case 'sunrise':
-            $html[$value] = date("g:i a", $output['sys']['sunrise']);
+            $html[$value] = date("g:i a", strtotime((string) $timezonedata->timezone->sunrise));
             break;
 
           case 'sunset':
-            $html[$value] = date("g:i a", $output['sys']['sunset']);
+            $html[$value] = date("g:i a", strtotime((string) $timezonedata->timezone->sunset));
             break;
         }
       }
@@ -204,6 +217,7 @@ class WeatherService {
    * Return an array containing the forecast weather info with 3 hours interval.
    */
   public function getHourlyForecastWeatherInformation($output, $config) {
+    $timezonedata = $this->getTimezoneGeo($output['city']['coord']['lat'], $output['city']['coord']['lon']);
     foreach ($output['list'] as $key => $data) {
       $html[$key]['forecast_time'] = date("g:i a", strtotime($output['list'][$key]['dt_txt']));
       $html[$key]['forecast_date'] = gmstrftime("%B %d", $output['list'][$key]['dt']);
@@ -227,7 +241,7 @@ class WeatherService {
               break;
 
             case 'date':
-              $html[$key][$value] = gmstrftime("%B %d %Y", REQUEST_TIME);
+              $html[$key][$value] = date("F j, Y", strtotime((string) $timezonedata->timezone->time));
               break;
 
             case 'coord':
@@ -265,7 +279,7 @@ class WeatherService {
               break;
 
             case 'time':
-              $html[$key][$value] = date("g:i a", REQUEST_TIME);
+              $html[$key][$value] = date("g:i a", strtotime((string) $timezonedata->timezone->time));
               break;
 
             case 'day':
@@ -296,6 +310,7 @@ class WeatherService {
    * Return an array containing the forecast weather on daily basis.
    */
   public function getDailyForecastWeatherInformation($output, $config) {
+    $timezonedata = $this->getTimezoneGeo($output['city']['coord']['lat'], $output['city']['coord']['lon']);
     foreach ($output['list'] as $key => $data) {
       $html[$key]['forecast_date'] = gmstrftime("%B %d", $output['list'][$key]['dt']);
       foreach ($config['outputitems'] as $value) {
@@ -318,7 +333,7 @@ class WeatherService {
               break;
 
             case 'date':
-              $html[$key][$value] = gmstrftime("%B %d %Y", REQUEST_TIME);
+              $html[$key][$value] = date("F j, Y", strtotime((string) $timezonedata->timezone->time));
               break;
 
             case 'coord':
@@ -356,7 +371,7 @@ class WeatherService {
               break;
 
             case 'time':
-              $html[$key][$value] = date("g:i a", REQUEST_TIME);
+              $html[$key][$value] = date("g:i a", strtotime((string) $timezonedata->timezone->time));
               break;
 
             case 'day':
