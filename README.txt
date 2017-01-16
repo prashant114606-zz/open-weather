@@ -12,22 +12,24 @@ CONTENTS OF THIS FILE
 
 INTRODUCTION
 ------------
-Open Weather is a module I created to parse out the weather response from
-openweathermap.org . The main reason I created this was because Google had
+Open Weather is a module  to parse out the weather response from
+openweathermap.org. The main reason we need this module because Google had
 killed it's weather API, thus rendering the Google Weather module useless. This
 module is a nice way for users to get weather in their site now.
 
 MODULE DETAILS
 --------------
 
-Open weather has a few nice features. First, it can handle unlimited cities for
+Open weather has a few nice features.
+1> It can handle unlimited cities for
 weather output. Each city will have it's own block which can be customised to
 show whatever weather details you see fit. You can even theme this yourself by
-overriding the theme that comes with the module. Second, It also provides the
-token option of users so that you can make use of their location.Third, It will
-also show the forecast on hourly basis with 3 hours of interval. Fourth,
-It also provides the data for daily forecast in your site, or simply display
-the data anyway they want.
+overriding the theme that comes with the module.
+2> It also provides the token option of users so that you can make use of their
+location.
+3> It will also show the forecast on hourly basis with 3 hours of interval.
+4> It also provides the data for daily forecast in your site, or simply display
+the data anyway you want.
 
 
 RECOMMENDED MODULES
@@ -41,12 +43,12 @@ CONFIGURATION
 -------------
 * The APPID which is required to make use of this module can be get from
 openweathermap.org and it is configurable and corresponding configuration
-settings are available at admin/config/user-interface/openweather.Enter your
-APPID over here and if the APPID entered is wrong you can get an error which can
-be seen under dblog.
+settings are available at admin/config/services/openweather.Enter your APPID
+over here and if the APPID entered is wrong you can get an error which you can
+see under dblog.
 
 * To use this module you can go to admin/structure/block and click on place
-block where you can find a bolck called Current Weather Block.
+block where you can find a bolck called Open Weather Block.
 
 * You can find the weather status using following types of input field.
 City name
@@ -93,26 +95,11 @@ In case the module is not working properly, you may try:
 FAQ
 ---
 
-Q: Is it used at multiple place or on multiple page with different
-configuration.
-
-A: Yes, it can be used anywhere in your site with different configuration.
-
-
-
 Q: Does it work without APPID?
 
-A: NO, you must have APPID from openweathermap.org. I recommend you download the
- devel module (https://www.drupal.org/project/devel) and you will able the see
- the error in dblog only for development purpose.
-
-
-
-Q: Can I change the configuration once the current open weather block is saved?
-
-A: Yes.
-
-
+A: NO, you must have APPID from openweathermap.org. I would recommend you
+download the devel module (https://www.drupal.org/project/devel) and you will
+able the see the error in dblog only for development purpose.
 
 
 MAINTAINERS
