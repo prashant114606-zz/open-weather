@@ -19,6 +19,13 @@ class WeatherService {
   public static $baseUri = 'http://api.openweathermap.org/';
 
   /**
+   * Base uri of geonames api.
+   *
+   * @var Drupal\openweather
+   */
+  public static $basegeoUri = 'http://ws.geonames.org/';
+
+  /**
    * The HTTP client to fetch the feed data with.
    *
    * @var \GuzzleHttp\ClientInterface
@@ -112,7 +119,15 @@ class WeatherService {
    *   The longitude decimal degrees.
    */
   public function getTimezoneGeo($latitude, $longitude) {
-    $timezone = $this->httpClient->request('GET', "http://ws.geonames.org/timezone?lat=" . $latitude . "&lng=" . $longitude . "&style=full&username=demo");
+    $query = [];
+    $query['lat'] = $latitude;
+    $query['lng'] = $longitude;
+    $query['style'] = 'full';
+    $query['username'] = 'demo';
+    $timezone = $this->httpClient->request('GET', self::$basegeoUri . '/timezone',
+    [
+      'query' => $query,
+    ]);
     return simplexml_load_string($timezone->getBody()->getContents());
   }
 
