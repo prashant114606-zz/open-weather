@@ -8,6 +8,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\openweather\WeatherService;
 use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Utility\Token;
 
 /**
  * Provides a 'OpenWeatherBlock' Block.
@@ -33,6 +34,13 @@ class WeatherBlock extends BlockBase implements ContainerFactoryPluginInterface 
   protected $moduleHandler;
 
   /**
+   * The token service.
+   *
+   * @var \Drupal\Core\Utility\Token
+   */
+  protected $token;
+
+  /**
    * Constructs a Drupal\Component\Plugin\PluginBase object.
    *
    * @param array $configuration
@@ -41,14 +49,17 @@ class WeatherBlock extends BlockBase implements ContainerFactoryPluginInterface 
    *   The plugin_id for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
+   * @param \Drupal\Core\Utility\Token $token
+   *   The token service.
    *
    * @var string $weatherservice
    *   The information from the Weather service for this block.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, WeatherService $weatherservice, ModuleHandlerInterface $module_handler) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, WeatherService $weatherservice, ModuleHandlerInterface $module_handler, Token $token) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->weatherservice = $weatherservice;
     $this->moduleHandler = $module_handler;
+    $this->token = $token;
   }
 
   /**
@@ -60,7 +71,8 @@ class WeatherBlock extends BlockBase implements ContainerFactoryPluginInterface 
       $plugin_id,
       $plugin_definition,
       $container->get('openweather.weather_service'),
-      $container->get('module_handler')
+      $container->get('module_handler'),
+      $container->get('token')
     );
   }
 
@@ -167,8 +179,7 @@ class WeatherBlock extends BlockBase implements ContainerFactoryPluginInterface 
   public function blockSubmit($form, FormStateInterface $form_state) {
     if ($this->moduleHandler->moduleExists("token")) {
       $user = $form_state->getValue('account');
-      $token_service = \Drupal::token();
-      $message = $token_service->replace($form_state->getValue('input_value'), array('user' => $user));
+      $message = $this->token->replace($form_state->getValue('input_value'), array('user' => $user));
     }
     $this->setConfigurationValue('outputitems', $form_state->getValue('weatherdata')['items']);
     if (!empty($message)) {
